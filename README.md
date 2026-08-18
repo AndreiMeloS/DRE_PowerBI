@@ -30,25 +30,43 @@ Nova medida >> Valor Real = sum(fAnalitico [Valor Realizado])
 Essa medida vai somar todo valor relizado no período.
 
 Nova medida que vamos precisar pegar o  Valor realizado e calcular ele em cada grupo principal da nossa DRE
-Dcontas>> pEGAR >>NOva Medida Receita Bruta = CALCULATE ([Valor Real], dContas [Grupo Pincipal] = "(+) RECEITA BRUTA")
+Dcontas>> pEGAR >>NOva Medida >> Receita Bruta = CALCULATE ([Valor Real], dContas [Grupo Pincipal] = "(+) RECEITA BRUTA")
 Aqui pegamos o nosso valor real mas estamos calculando apenas onde o grupo principal for igual a "(+) RECEITA BRUTA"
 
 
 3.2 Criar um medida que nos dê flexbilidade de trablhar com Calculos, deduções e somas natural de uma DRE.
+
+ FORMULA PARA RETORNAR A RECEITA BRUTA
+ 
  Nova medida >> NOME Valor_DRE 
 
- Primiero passo criar uma varável cuja dormula:
- 
- var DRE LinhaDRE = selectedvalue(dcampos DRE [Linha DRE])
- Returne
- stwitch (   #é a fundação que substutui um valor por  outro.
-         LinhaDRE,
-         "(+) Receita Bruta", [Rceita Bruta],
-         blank())
+Valor DRE = 
+var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE]) --> Essa variabel vai ta sempre olhando para qualcampo da nossa DRE (ex.receviat bruta ,dedeucç~eos, receita liquida)  vai estra selecionado na nossa tabela.
 
- Fazer isso para todos os grupos principais da tabela dCampos DRE
+Switch para substituir um valor por outro --> Vamos pegar o campo de DRE e a criar o primeiro switch. Objetivo so swwitch: Qunado ele for igual "Rceitab ruta" ele trará valor dareceita bruta.
+
+Valor DRE = 
+var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
+switch (  
+        LinhaDRE,
+        "(+) RECEITA BRUTA", [Receita Bruta]
+        blank()) 
+
+O blanl() é quando nã ofor receita bruta vai ficar vazio.
+
+PARA OS CAMPOS DE DEDUÇÕES
+Nova medida >> Deduçoes = CALCULATE ([Valor Real], dContas[Grupo Principal] = "(-) DEDUÇÕES")
+
+Valor DRE = 
+var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
+switch (  
+        LinhaDRE,
+        "(+) RECEITA BRUTA", [Receita Bruta]
+        "(-) Deduções", [Deduções],
+        blank()) 
+
  
- 
+
 
 
 
