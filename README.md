@@ -51,20 +51,21 @@ var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE]) --> Essa variabel vai ta sem
 Switch para substituir um valor por outro --> Vamos pegar o campo de DRE e a criar o primeiro switch. Objetivo so swwitch: Qunado ele for igual "Rceitab ruta" ele trará valor dareceita bruta.
 
 Adiciona na medida "Valor DRE"
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
         LinhaDRE,
         "(+) RECEITA BRUTA", [Receita Bruta]
         blank()) 
-
+```
 O blanl() é quando nã ofor receita bruta vai ficar vazio.
 
 4.2 FORMULA PARA RETORNAR OS CAMPOS DE DEDUÇÕES
 Nova medida >> Deduçoes = CALCULATE ([Valor Real], dContas[Grupo Principal] = "(-) DEDUÇÕES")
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -72,7 +73,7 @@ switch (
         "(+) RECEITA BRUTA", [Receita Bruta]
         "(-) Deduções", [Deduções],
         blank()) 
-
+```
 4.3 FORMULA PARA RETORNAR O CAMPO DE RECEITA LIQUIDA
 
 Nada mais nada menos que que a Medida Rceita Bruta menos a medida Deduções
@@ -80,7 +81,7 @@ Nada mais nada menos que que a Medida Rceita Bruta menos a medida Deduções
 Nova medida >> Receita liquida = [Receita Bruta] + [Deduções] 
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -89,7 +90,7 @@ switch (
         "(-) Deduções", [Deduções],
         "(=) RECEITA LIQUIDA", [Receita Liquida],
         blank())
-
+```
 4.4 FORMULA PARA RETORNAR O CPV
 
 O custo produto vendido vai sero CALCULATE do valor realizado, onde que o Grupo de contas for igual "(-) CPV"
@@ -97,7 +98,7 @@ O custo produto vendido vai sero CALCULATE do valor realizado, onde que o Grupo 
 Nova Medida >> CPV = CALCULATE ([Valor Real], dContas [Grupo Principal] = "(-) CPV")
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -107,7 +108,7 @@ switch (
         "(=) RECEITA LIQUIDA", [Receita Liquida],
         "(-) CPV", [CPV]
         blank())
-
+```
 4.5 FORMULA PARA RETORNAR O LUCRO BRUTO
 
 Vai ser igual receita liquida mais o CPV
@@ -115,7 +116,7 @@ Vai ser igual receita liquida mais o CPV
 NOVA MEDIDA >> Lucro Bruto  = [Receita Liquida] + [CPV]
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -126,7 +127,7 @@ switch (
         "(-) CPV", [CPV]
         "(=) Lucro Bruto", [Lucro Bruto]
         blank())
-
+```
 4.6 FORMULA PARA RETORNAR as Despesas Operacionais
 
 Anova medida vai ser Vai ser o calculate da nossa medida Valor Real, onde no grupo principal for igual a "(=) Despesas Operacionais"
@@ -134,7 +135,7 @@ Anova medida vai ser Vai ser o calculate da nossa medida Valor Real, onde no gru
 NOCA MEDIDA >>  Despesas Operacionais = CALCULATE ([Valor Real], dContas[Grupo Principal] = "(-) Despesas Operacionais")
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -146,7 +147,7 @@ switch (
         "(=) Lucro Bruto", [Lucro Bruto]
         "(-) Despesas Operacionais", [Despesas Operacionais]
         blank())
-
+```
 4.7 FORMULA PARA RETORNAR "(+/-) OUTRAS RECEITAS/DESPESAS"
 
 Nessa nova medida onde vai ser igual CALCULATE do nosso campo  Valor Real onde o grupo principal for igual 
@@ -154,7 +155,7 @@ Nessa nova medida onde vai ser igual CALCULATE do nosso campo  Valor Real onde o
 Nova medida >> Outras Receitas e Despesas = CALCULATE ([Valor Real], dContas[Grupo Principal] = "(+/-) OUTRAS RECEITAS/DESPESAS")
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -167,7 +168,7 @@ switch (
         "(-) Despesas Operacionais", [Despesas Operacionais]
         "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
         blank())
-
+```
 
 
 4.8 FORMULA PARA RETORNAR "(=) EBITDA"
@@ -177,7 +178,7 @@ Nessa nova medida será Lucro Bruto mais despas Operacionais mais outras receita
 Nova medida >> EBITDA = ´[lUCRO bRUTO[ + ´[Depssas Operacionais] + [Outras Rceitas e Despesas]
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -191,7 +192,7 @@ switch (
         "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
          "(=) EBITDA", [EBITDA]
         blank())
-
+```
 4.9 FORMULA PARA RETORNAR "(-) DEPRECIAÇÃO E AMORTIZAÇÃO"
 
 Nessa nova medida é ocalculate do valor real a onde ogrupo pricnipal for igual a "(-) DEPRECIAÇÃO E AMORTIZAÇÃO"
@@ -199,7 +200,7 @@ Nessa nova medida é ocalculate do valor real a onde ogrupo pricnipal for igual 
 Nova medida >> Depreciação e Armotização = CALCULATE ([Valor Real], dContas[Grupo Principal] = "(-) DEPRECIAÇÃO E AMORTIZAÇÃO" )
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -214,7 +215,7 @@ switch (
          "(=) EBITDA", [EBITDA
          "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização]
         blank())
-
+```
 4.10 FORMULA PARA RETORNAR "(=) EBIT"
 
 Nessa nova medida IGUAL AO EBITDA mais Depreciação e Amortização
@@ -222,7 +223,7 @@ Nessa nova medida IGUAL AO EBITDA mais Depreciação e Amortização
 Nova medida >> EBIT = [EBITDA] + [Depreciação e Armotização]
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -238,7 +239,7 @@ switch (
          "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização]
          "(=) EBIT", [EBIT] 
         blank())
-
+```
 
 4.11 FORMULA PARA RETORNAR "(+/-) RESULTADO FINANCEIRO"
 
@@ -247,7 +248,7 @@ Nessa nova medida Resultado financeiro igual  CALCULATE do Valor Real, onde o Gr
 Nova medida >> Resultado Financeiro = CALCULATE ([Valor Real], dContas[Grupo Principal] = "(+/-) RESULTADO FINANCEIRO")
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -264,16 +265,16 @@ switch (
          "(=) EBIT", [EBIT] 
          "(+/-) RESULTADO FINANCEIRO", [RESULTADO FINANCEIRO]
         blank())
-
+```
 
 4.12 FORMULA PARA RETORNAR "(=) LAIR"
 
-Nessa nova medida
+Nessa nova medida será o EBIT mais Resultado Financeiro
 
 Nova medida >> LAIR = [EBIT] + [Resultado Financeiro]
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -291,15 +292,16 @@ switch (
          "(+/-) RESULTADO FINANCEIRO", [RESULTADO FINANCEIRO]
          "(=) LAIR", [LAIR]
         blank())
+```
 
 4.13 FORMULA PARA RETORNAR "(-) IRPJ E CSLL"
 
-Nessa nova medida
+Nessa nova medida vai ser igual ao aCALCULATE do  Valor Real, onde o grupos principal fori igual a "(-) IRPJ E CSLL"
 
-Nova medida >>
+Nova medida >> IRPJ e ISLL = CALCULATE([Valor Real], dContas[Grupo Principal] = "(-) IRPJ E CSLL")
 
 Adiciona na medida "Valor DRE"
-
+```DAX
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
 switch (  
@@ -310,22 +312,23 @@ switch (
         "(-) CPV", [CPV]
         "(=) Lucro Bruto", [Lucro Bruto]
         "(-) Despesas Operacionais", [Despesas Operacionais]
-        "(+/-) OUTRAS RECEITAS/DESPESAS",
-         "(=) EBITDA"
-         "(-) DEPRECIAÇÃO E AMORTIZAÇÃO"
-         "(=) EBIT"
-         "(+/-) RESULTADO FINANCEIRO"
-         "(=) LAIR"
-         "(-) IRPJ E CSLL"
+        "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+         "(=) EBITDA", [EBITDA]
+         "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização]
+         "(=) EBIT", [EBIT] 
+         "(+/-) RESULTADO FINANCEIRO", [RESULTADO FINANCEIRO]
+         "(=) LAIR", [LAIR]
+         "(-) IRPJ E CSLL", [IRPJ e CSLL]
         blank())
-
+```
 4.14 FORMULA PARA RETORNAR "(=) LUCRO/PREJUIZO LÍQUIDO"
 
 Nessa nova medida
 
-Nova medida >>
+Nova medida >> Lucro ou Prejuizo Líquido = [LAIR] + [IRPJ e CSLL]
 
 Adiciona na medida "Valor DRE"
+```DAX
 
 Valor DRE = 
 var LinhaDRE = selectedvalue(dCamposDRE[Linha DRE])
@@ -344,7 +347,11 @@ switch (
          "(+/-) RESULTADO FINANCEIRO"
          "(=) LAIR"
          "(-) IRPJ E CSLL"
-         "(=) LUCRO/PREJUIZO LÍQUIDO"
+         "(=) LUCRO/PREJUIZO LÍQUIDO", [Lucro ou Prejuizo Líquido]
         blank())
+```
+
+5 PROXIMO PASSO É FORMATAR NOSSA TABELA PARA DEIXARMOS VISULAEMNTE MELHOR.
+
 
 
