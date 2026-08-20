@@ -340,13 +340,13 @@ switch (
         "(-) CPV", [CPV]
         "(=) Lucro Bruto", [Lucro Bruto]
         "(-) Despesas Operacionais", [Despesas Operacionais]
-        "(+/-) OUTRAS RECEITAS/DESPESAS",
-         "(=) EBITDA"
-         "(-) DEPRECIAÇÃO E AMORTIZAÇÃO"
-         "(=) EBIT"
-         "(+/-) RESULTADO FINANCEIRO"
-         "(=) LAIR"
-         "(-) IRPJ E CSLL"
+        "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+         "(=) EBITDA", [EBITDA]
+         "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização]
+         "(=) EBIT", [EBIT] 
+         "(+/-) RESULTADO FINANCEIRO", [RESULTADO FINANCEIRO]
+         "(=) LAIR", [LAIR]
+         "(-) IRPJ E CSLL", [IRPJ e CSLL]
          "(=) LUCRO/PREJUIZO LÍQUIDO", [Lucro ou Prejuizo Líquido]
         blank())
 ```
