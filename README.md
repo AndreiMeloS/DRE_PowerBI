@@ -1,5 +1,24 @@
 # DRE_PowerBI
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_______________________________________-
 PASSOS INICIAIS
 Os dados brutos não precisaram de tratamento, então foram prontamente carregados.
 
@@ -388,7 +407,621 @@ Para Rceita líquida / Lucro bruto / EBITDA / EBIT / LUCRO / PREJUIZO
 IMAGEM:
 <img width="208" height="70" alt="image" src="https://github.com/user-attachments/assets/51e5a59f-0cde-4e05-92a9-8075e4d978e9" />
 
-finalizado nosso dasbhard
-<img width="1275" height="712" alt="image" src="https://github.com/user-attachments/assets/262c064e-46b6-42b2-ba30-e8ccf4227ef2" />
+
+
+Foi utilizada a função:
+
+= List.Dates
+
+Com os seguintes parâmetros:
+
+Start: 01/01/2025
+Count: 730
+Step: 1
+
+Dessa forma, foi criada uma tabela contendo as datas do período analisado.
+
+Colunas criadas
+
+A partir da tabela calendário foram criadas novas colunas:
+
+Ano
+Último dia do mês
+Nome do mês
+
+Também foi realizada a mesclagem entre Mês e Ano, criando uma coluna no formato:
+
+Jan/2025
+⭐ 2. Modelagem dos Dados — Esquema Estrela
+
+A relação entre as tabelas foi construída utilizando o modelo de Esquema Estrela (Star Schema).
+
+<img width="573" height="638" alt="Modelo em Esquema Estrela" src="https://github.com/user-attachments/assets/4c740ad2-ad26-45d4-bf3b-f98d69dbcb61" />
+2.1 Explicação das Tabelas
+
+Neste projeto trabalharemos com três estruturas principais:
+
+fAnalitica
+
+Será nossa tabela Fato.
+
+Ela contém os registros analíticos utilizados para os cálculos da DRE.
+
+dContas
+
+Será nossa dimensão de contas.
+
+Para cada código de conta, essa tabela apresenta informações como:
+
+Grupo Principal
+Subgrupo
+Descrição da Conta
+dCamposDRE
+
+Será uma tabela desconectada, ou seja, não possuirá relacionamento direto com as demais tabelas.
+
+Essa tabela será utilizada para controlar dinamicamente as linhas que serão apresentadas na DRE.
+
+🎨 3. Visualização dos Dados — Tema Clássico
+
+Para iniciar a construção visual do dashboard, foi utilizado o Tema Clássico do Power BI.
+
+3.1 Caixa de Texto
+
+Foi inserida uma caixa de texto para o título.
+
+Configuração:
+
+Caixa de Texto
+→ Título
+→ Fonte 24
+🎛️ 3.2 Botão de Segmentação — Filtro de Ano
+
+Foi criado um botão de segmentação para permitir a seleção do ano da análise.
+
+Caminho:
+
+Botões
+→ dCalendario
+→ Filtro de Ano
+
+Os anos disponíveis são:
+
+2025
+2026
+Formatação
+Geral
+Desativar título
+Visual
+Configuração de Segmentação
+→ Seleção Única
+Botões
+Retângulo
+→ Cantos arredondados
+→ Raio 5
+Texto explicativo
+Valor
+→ Forma centralizada
+📋 4. Visual de Tabela
+
+Para construir o visual da DRE, primeiro foi criada uma tabela exclusiva para armazenar as medidas.
+
+4.1 Criação da tabela de Medidas
+
+No Power BI:
+
+Modelagem
+→ Nova Tabela
+
+Foi utilizada a fórmula:
+
+Medidas = {0}
+📐 4.2 Criação das Medidas
+Valor Real
+
+A primeira medida criada foi:
+
+Valor Real =
+SUM(fAnalitica[Valor Realizado])
+
+Essa medida soma todo o valor realizado no período.
+
+Receita Bruta
+
+Foi criada uma medida para calcular o valor realizado apenas para o grupo principal de Receita Bruta:
+
+Receita Bruta =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(+) RECEITA BRUTA"
+)
+
+Aqui pegamos o nosso Valor Real, mas calculamos apenas onde o grupo principal for igual a:
+
+(+) RECEITA BRUTA
+🧮 5. Medida Dinâmica da DRE
+
+O próximo passo foi criar uma medida que permitisse trabalhar com diferentes cálculos, deduções e somas naturais de uma DRE.
+
+Para isso, utilizaremos a tabela dCamposDRE.
+
+<img width="336" height="392" alt="Campos da DRE" src="https://github.com/user-attachments/assets/8eb19658-df6e-453b-be01-5df998041dea" />
+5.1 Fórmula para Retornar a Receita Bruta
+
+Foi criada uma nova medida chamada:
+
+Valor_DRE
+
+A variável LinhaDRE ficará sempre observando qual campo da nossa DRE está selecionado na tabela.
+
+Exemplos:
+
+Receita Bruta
+Deduções
+Receita Líquida
+
+Para isso foi utilizada a função SWITCH.
+
+A lógica é:
+
+Quando o campo selecionado for Receita Bruta, retornar o valor da medida Receita Bruta.
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    BLANK()
+)
+
+O BLANK() faz com que, quando não for Receita Bruta, o resultado fique vazio.
+
+5.2 Fórmula para Retornar as Deduções
+
+Foi criada a medida:
+
+Deduções =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(-) DEDUÇÕES"
+)
+
+Depois, a medida Valor DRE foi atualizada:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    BLANK()
+)
+5.3 Fórmula para Retornar a Receita Líquida
+
+A Receita Líquida será calculada a partir da Receita Bruta e das Deduções.
+
+Receita Liquida =
+[Receita Bruta] + [Deduções]
+
+A medida Valor DRE passa a contemplar a Receita Líquida:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    BLANK()
+)
+5.4 Fórmula para Retornar o CPV
+
+O Custo dos Produtos Vendidos (CPV) será calculado utilizando o CALCULATE sobre o Valor Real, filtrando o grupo de contas:
+
+(-) CPV
+
+Medida:
+
+CPV =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(-) CPV"
+)
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    BLANK()
+)
+5.5 Fórmula para Retornar o Lucro Bruto
+
+O Lucro Bruto será calculado como:
+
+Receita Líquida + CPV
+
+Medida:
+
+Lucro Bruto =
+[Receita Liquida] + [CPV]
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    BLANK()
+)
+5.6 Fórmula para Retornar as Despesas Operacionais
+
+A medida será um CALCULATE do nosso Valor Real, filtrando o grupo principal:
+
+(-) Despesas Operacionais
+
+Medida:
+
+Despesas Operacionais =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(-) Despesas Operacionais"
+)
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    BLANK()
+)
+5.7 Fórmula para Retornar Outras Receitas/Despesas
+
+Foi criada a medida:
+
+Outras Receitas e Despesas =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(+/-) OUTRAS RECEITAS/DESPESAS"
+)
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    BLANK()
+)
+5.8 Fórmula para Retornar o EBITDA
+
+O EBITDA será calculado como:
+
+Lucro Bruto
++ Despesas Operacionais
++ Outras Receitas e Despesas
+
+Medida:
+
+EBITDA =
+[Lucro Bruto]
++ [Despesas Operacionais]
++ [Outras Receitas e Despesas]
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    "(=) EBITDA", [EBITDA],
+    BLANK()
+)
+5.9 Fórmula para Retornar Depreciação e Amortização
+
+A medida será um CALCULATE do Valor Real, filtrando o grupo principal:
+
+(-) DEPRECIAÇÃO E AMORTIZAÇÃO
+
+Medida:
+
+Depreciação e Armotização =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(-) DEPRECIAÇÃO E AMORTIZAÇÃO"
+)
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    "(=) EBITDA", [EBITDA],
+    "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização],
+    BLANK()
+)
+5.10 Fórmula para Retornar o EBIT
+
+O EBIT será calculado como:
+
+EBITDA + Depreciação e Amortização
+
+Medida:
+
+EBIT =
+[EBITDA] + [Depreciação e Armotização]
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    "(=) EBITDA", [EBITDA],
+    "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização],
+    "(=) EBIT", [EBIT],
+    BLANK()
+)
+5.11 Fórmula para Retornar o Resultado Financeiro
+
+O Resultado Financeiro será calculado utilizando o CALCULATE do Valor Real, filtrando o grupo principal:
+
+(+/-) RESULTADO FINANCEIRO
+
+Medida:
+
+Resultado Financeiro =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(+/-) RESULTADO FINANCEIRO"
+)
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    "(=) EBITDA", [EBITDA],
+    "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização],
+    "(=) EBIT", [EBIT],
+    "(+/-) RESULTADO FINANCEIRO", [Resultado Financeiro],
+    BLANK()
+)
+5.12 Fórmula para Retornar o LAIR
+
+O LAIR será calculado como:
+
+EBIT + Resultado Financeiro
+
+Medida:
+
+LAIR =
+[EBIT] + [Resultado Financeiro]
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    "(=) EBITDA", [EBITDA],
+    "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização],
+    "(=) EBIT", [EBIT],
+    "(+/-) RESULTADO FINANCEIRO", [Resultado Financeiro],
+    "(=) LAIR", [LAIR],
+    BLANK()
+)
+5.13 Fórmula para Retornar IRPJ e CSLL
+
+A medida será um CALCULATE do Valor Real, filtrando o grupo principal:
+
+(-) IRPJ E CSLL
+
+Medida:
+
+IRPJ e CSLL =
+CALCULATE(
+    [Valor Real],
+    dContas[Grupo Principal] = "(-) IRPJ E CSLL"
+)
+
+Atualização da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    "(=) EBITDA", [EBITDA],
+    "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização],
+    "(=) EBIT", [EBIT],
+    "(+/-) RESULTADO FINANCEIRO", [Resultado Financeiro],
+    "(=) LAIR", [LAIR],
+    "(-) IRPJ E CSLL", [IRPJ e CSLL],
+    BLANK()
+)
+5.14 Fórmula para Retornar o Lucro/Prejuízo Líquido
+
+Foi criada a medida:
+
+Lucro ou Prejuizo Líquido =
+[LAIR] + [IRPJ e CSLL]
+
+Atualização final da medida Valor DRE:
+
+Valor DRE =
+VAR LinhaDRE = SELECTEDVALUE(dCamposDRE[Linha DRE])
+RETURN
+SWITCH(
+    LinhaDRE,
+    "(+) RECEITA BRUTA", [Receita Bruta],
+    "(-) Deduções", [Deduções],
+    "(=) RECEITA LIQUIDA", [Receita Liquida],
+    "(-) CPV", [CPV],
+    "(=) Lucro Bruto", [Lucro Bruto],
+    "(-) Despesas Operacionais", [Despesas Operacionais],
+    "(+/-) OUTRAS RECEITAS/DESPESAS", [Outras Receitas e Despesas],
+    "(=) EBITDA", [EBITDA],
+    "(-) DEPRECIAÇÃO E AMORTIZAÇÃO", [Depreciação e Armotização],
+    "(=) EBIT", [EBIT],
+    "(+/-) RESULTADO FINANCEIRO", [Resultado Financeiro],
+    "(=) LAIR", [LAIR],
+    "(-) IRPJ E CSLL", [IRPJ e CSLL],
+    "(=) LUCRO/PREJUIZO LÍQUIDO", [Lucro ou Prejuizo Líquido],
+    BLANK()
+)
+🎨 6. Formatação da Tabela
+
+O próximo passo foi formatar a tabela para melhorar sua apresentação visual.
+
+Tamanho
+
+Foi configurado o tamanho dos:
+
+Valores
+Colunas
+Linhas
+
+Para:
+
+Tamanho 11
+🟢🔴 6.1 Formatação Condicional
+
+Foi configurada uma formatação para destacar os subtotais:
+
+Vermelho quando o resultado for negativo
+Verde quando o resultado for positivo
+
+Caminho:
+
+Selecionar a tabela
+→ Pincel de Formatação
+→ Visual
+→ Elementos da Célula
+<img width="904" height="394" alt="Formatação condicional" src="https://github.com/user-attachments/assets/1d72a820-a52f-40d9-923a-b491c4a78d58" />
+💳 6.2 Criação dos Cartões
+
+Foi criado um visual de cartões para apresentar os principais indicadores da DRE:
+
+Receita Líquida
+Lucro Bruto
+EBITDA
+EBIT
+Lucro/Prejuízo
+📅 6.3 Filtro de Data
+
+Foi inserido um filtro de data para permitir que o usuário personalize o período da análise.
+
+<img width="208" height="70" alt="Filtro de data" src="https://github.com/user-attachments/assets/51e5a59f-0cde-4e05-92a9-8075e4d978e9" />
+🏁 Dashboard Finalizado
+
+Após a construção das medidas, tabela, cartões e filtros, o dashboard foi finalizado.
+
+<img width="1275" height="712" alt="Dashboard DRE Finalizado" src="https://github.com/user-attachments/assets/262c064e-46b6-42b2-ba30-e8ccf4227ef2" />
+📚 Principais Aprendizados
+
+Neste projeto foram praticados conceitos de:
+
+Power BI
+Power Query
+DAX
+Tabela Calendário
+Modelagem em Esquema Estrela
+Tabelas Fato e Dimensão
+Tabelas desconectadas
+Medidas DAX
+CALCULATE
+SELECTEDVALUE
+SWITCH
+SUM
+Construção dinâmica de uma DRE
+Formatação condicional
+Segmentação de dados
+Construção de indicadores financeiros
+Visualização de dados financeiros
+🚀 Resultado
+
+O resultado foi um dashboard de DRE capaz de apresentar de forma dinâmica os principais componentes do resultado financeiro, desde a Receita Bruta até o Lucro/Prejuízo Líquido, permitindo também a análise por diferentes períodos.
+
 
 
