@@ -1,8 +1,26 @@
 # DRE_PowerBI
 
+PASSOS INICIAIS
+Os dados brutos não precisaram de tratamento, então foram prontamente carregados.
 
+Criação da tabela calendário
 
+É uma tabela que contém todas as datas do meu período de análise.
 
+Transformar dados >> Nova Fonte >> Consulta Nula >> Escrever o código List.Dates e paerta enter
+
+= List.dates e adicionas os parâmetro Start 01/01/2025 / 730 / step 1
+
+Cria novas colunas de Ano, último dia do mês, nome do mês 
+Mescla Mês e Ano TIPO "Jan/2025"
+
+Criação da relação entre tabela foi no schema estrela
+
+<img width="573" height="638" alt="image" src="https://github.com/user-attachments/assets/4c740ad2-ad26-45d4-bf3b-f98d69dbcb61" />
+
+EXPLICAÇÃO SOBRE AS TABELA
+
+Trabalharemos uma tabela Analítica fAnalitica será nossa tabela FATO, Uma tabela de contas dContas (onde para Códido de Contas ela trás um grupo principal, sub grupo e Descrição da Cona) terceiro teremos a tabela dCamposDRE que será uma tabela desconectada não erá relação.
 
 
 VISUAÇIZAÃO DE DADOS - TEMA CLÁSSICO
@@ -353,5 +371,24 @@ switch (
 
 5 PROXIMO PASSO É FORMATAR NOSSA TABELA PARA DEIXARMOS VISULAEMNTE MELHOR.
 
+TAMANHO DOS VALORES /COLUNA / LINHAS TAANHO 11
+
+5.1 Deixar os subtotoais vermelho se for negativo e verde para positivo.
+
+Clica na tabela >> Pincel de formatação >> Visual >> Elementos da célula 
+Configura como naimagem abaixo:
+<img width="904" height="394" alt="image" src="https://github.com/user-attachments/assets/1d72a820-a52f-40d9-923a-b491c4a78d58" />
+
+5.1 Cria um visual de cartões
+
+Para Rceita líquida / Lucro bruto / EBITDA / EBIT / LUCRO / PREJUIZO
+
+5.2 INSERIR UM FILTRO DE DAT QUE PODE PERSONALIZAR O PERIODE ANALISE
+
+IMAGEM:
+<img width="208" height="70" alt="image" src="https://github.com/user-attachments/assets/51e5a59f-0cde-4e05-92a9-8075e4d978e9" />
+
+finalizado nosso dasbhard
+<img width="1275" height="712" alt="image" src="https://github.com/user-attachments/assets/262c064e-46b6-42b2-ba30-e8ccf4227ef2" />
 
 
